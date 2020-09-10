@@ -2,40 +2,44 @@
 
 class CredentialsController < ApplicationController
   def create
-    credential_options = WebAuthn.credential_creation_options
-    credential_options[:user][:id] = Base64.strict_encode64(current_user.username)
-    credential_options[:user][:name] = current_user.username
-    credential_options[:user][:displayName] = current_user.username
+    create_options = WebAuthn::Credential.options_for_create(
+      user: {
+        id: current_user.webauthn_id,
+        name: current_user.username,
+      },
+      exclude: current_user.credentials.pluck(:external_id)
+    )
 
-    credential_options[:challenge] = bin_to_str(credential_options[:challenge])
-    current_user.update!(current_challenge: credential_options[:challenge])
+    session[:current_registration] = { challenge: create_options.challenge }
 
     respond_to do |format|
-      format.json { render json: credential_options.merge(user_id: current_user.id) }
+      format.json { render json: create_options }
     end
   end
 
   def callback
-    auth_response = WebAuthn::AuthenticatorAttestationResponse.new(
-      attestation_object: str_to_bin(params[:response][:attestationObject]),
-      client_data_json: str_to_bin(params[:response][:clientDataJSON])
-    )
+    webauthn_credential = WebAuthn::Credential.from_create(params)
 
-    if auth_response.verify(str_to_bin(current_user.current_challenge), request.base_url)
-      if params[:response][:attestationObject].present?
-        credential = current_user.credentials.find_or_initialize_by(
-          external_id: Base64.strict_encode64(auth_response.credential.id)
-        )
+    begin
+      webauthn_credential.verify(session["current_registration"]["challenge"])
 
-        credential.update!(
-          nickname: params[:credential_nickname],
-          public_key: Base64.strict_encode64(auth_response.credential.public_key)
-        )
+      credential = current_user.credentials.find_or_initialize_by(
+        external_id: Base64.strict_encode64(webauthn_credential.raw_id)
+      )
+
+      if credential.update(
+        nickname: params[:credential_nickname],
+        public_key: webauthn_credential.public_key,
+        sign_count: webauthn_credential.sign_count
+      )
+        render json: { status: "ok" }, status: :ok
+      else
+        render json: "Couldn't add your Security Key", status: :unprocessable_entity
       end
-
-      render json: { status: "ok" }, status: :ok
-    else
-      render json: { status: "forbidden" }, status: :forbidden
+    rescue WebAuthn::Error => e
+      render json: "Verification failed: #{e.message}", status: :unprocessable_entity
+    ensure
+      session.delete("current_registration")
     end
   end
 

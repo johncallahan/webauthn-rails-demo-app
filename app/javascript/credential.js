@@ -1,4 +1,14 @@
-import * as Encoder from "encoder";
+import * as WebAuthnJSON from "@github/webauthn-json"
+import { showMessage } from "messenger";
+
+function getCSRFToken() {
+  var CSRFSelector = document.querySelector('meta[name="csrf-token"]')
+  if (CSRFSelector) {
+    return CSRFSelector.getAttribute("content")
+  } else {
+    return null
+  }
+}
 
 function callback(url, body) {
   fetch(url, {
@@ -7,45 +17,35 @@ function callback(url, body) {
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
-      "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+      "X-CSRF-Token": getCSRFToken()
     },
     credentials: 'same-origin'
-  }).then(function() {
-    window.location.replace("/")
+  }).then(function(response) {
+    if (response.ok) {
+      window.location.replace("/")
+    } else if (response.status < 500) {
+      response.text().then(showMessage);
+    } else {
+      showMessage("Sorry, something wrong happened.");
+    }
   });
 }
 
 function create(callbackUrl, credentialOptions) {
-  navigator.credentials.create({ "publicKey": credentialOptions }).then(function(attestation) {
-    callback(callbackUrl, {
-      id: attestation.id,
-      response: {
-        clientDataJSON: Encoder.binToStr(attestation.response.clientDataJSON),
-        attestationObject: Encoder.binToStr(attestation.response.attestationObject)
-      }
-    });
+  WebAuthnJSON.create({ "publicKey": credentialOptions }).then(function(credential) {
+    callback(callbackUrl, credential);
   }).catch(function(error) {
-    console.log(error);
+    showMessage(error);
   });
 
   console.log("Creating new public key credential...");
 }
 
 function get(credentialOptions) {
-  navigator.credentials.get({ "publicKey": credentialOptions }).then(function(credential) {
-    var assertionResponse = credential.response;
-
-    callback("/session/callback", {
-      id: Encoder.binToStr(credential.rawId),
-      response: {
-        clientDataJSON: Encoder.binToStr(assertionResponse.clientDataJSON),
-        signature: Encoder.binToStr(assertionResponse.signature),
-        userHandle: Encoder.binToStr(assertionResponse.userHandle),
-        authenticatorData: Encoder.binToStr(assertionResponse.authenticatorData)
-      }
-    });
+  WebAuthnJSON.get({ "publicKey": credentialOptions }).then(function(credential) {
+    callback("/session/callback", credential);
   }).catch(function(error) {
-    console.log(error);
+    showMessage(error);
   });
 
   console.log("Getting public key credential...");

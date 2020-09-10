@@ -2,22 +2,26 @@
   "name": "webauthn-app",
   "private": true,
   "engines": {
+    "node": "10.x",
     "yarn": ">=1.7.0"
   },
   "dependencies": {
-    "@material/button": "^0.37.0",
-    "@material/card": "^0.40.1",
-    "@material/list": "^0.37.0",
-    "@material/menu": "^0.36.1",
-    "@material/textfield": "^0.37.0",
-    "@material/top-app-bar": "^0.37.0",
-    "@material/typography": "^0.35.0",
-    "@rails/webpacker": "3.5",
-    "rails-ujs": "^5.2.1",
+    "@github/webauthn-json": "^0.4.5",
+    "@material/button": "~4.0.0",
+    "@material/card": "~4.0.0",
+    "@material/list": "~4.0.0",
+    "@material/menu": "~4.0.0",
+    "@material/snackbar": "^4.0.0",
+    "@material/textfield": "~4.0.0",
+    "@material/top-app-bar": "~4.0.0",
+    "@material/typography": "~4.0.0",
+    "@rails/ujs": "~6.0.2-1",
+    "@rails/webpacker": "5.1.1",
+    "sinon": "^9.0.2",
     "stimulus": "^1.1.0",
     "turbolinks": "^5.2.0"
   },
   "devDependencies": {
-    "webpack-dev-server": "^3.1.14"
+    "webpack-dev-server": "^3.11.0"
   }
 }

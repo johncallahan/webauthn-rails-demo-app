@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
 
   def sign_in(user)
     session[:user_id] = user.id
-    user.update!(current_challenge: nil)
   end
 
   def sign_out
@@ -19,13 +18,5 @@ class ApplicationController < ActionController::Base
       if session[:user_id]
         User.find_by(id: session[:user_id])
       end
-  end
-
-  def str_to_bin(str)
-    Base64.strict_decode64(str)
-  end
-
-  def bin_to_str(bin)
-    Base64.strict_encode64(bin)
   end
 end
