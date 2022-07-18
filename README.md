@@ -33,13 +33,31 @@ $ yarn install (or npm install)
 $ bundle exec rake db:setup
 ```
 
-#### Running
+#### Running (locally)
 
 ```
+$ export USER_VERIFICATION=required
 $ bundle exec rails s
 ```
 
 Now you can visit http://localhost:3000 to play with the demo site.
+
+#### Running (Heroku)
+
+```
+$ heroku create
+$ git push heroku main
+$ heroku run rails db:migrate
+$ heroku config:set USER_VERIFICATION=required
+$ heroku config:set WEBAUTHN_ORIGIN=https://<generate site name>.herokuapp.com
+$ heroku open
+```
+
+## ENV variables
+
+* USER_VERIFICATION=required (for biometric user verification)
+* USER_VERIFICATION=discouraged (for user presence only)
+* WEBAUTHN_ORIGIN=https://<generate site name>.herokuapp.com
 
 ## Development
 
