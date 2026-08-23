@@ -26,6 +26,8 @@ env:
     RAILS_LOG_TO_STDOUT: enabled
     RAILS_SERVE_STATIC_FILES: enabled
     LANG: en_US.UTF-8
+    # Must match the origin the browser is served from (see proxy.host above).
+    WEBAUTHN_ORIGIN: https://webauthn.cedarcode.com
   secret:
     - RAILS_MASTER_KEY
     - DATABASE_URL
