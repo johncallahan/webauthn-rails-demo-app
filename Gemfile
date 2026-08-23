@@ -7,10 +7,10 @@ gem "webauthn", "~> 3.4"
 
 gem 'bootsnap', '~> 1.25', require: false
 gem 'importmap-rails', '~> 2.2'
+gem 'pg', '~> 1.6'
 gem 'propshaft', '~> 1.3'
 gem 'puma', '~> 8.0'
 gem "rollbar", "~> 3.8"
-gem 'sqlite3', '>= 1.4'
 gem 'stimulus-rails', '~> 1.3'
 
 group :development, :deploy do

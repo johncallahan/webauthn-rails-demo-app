@@ -28,6 +28,22 @@ env:
     LANG: en_US.UTF-8
   secret:
     - RAILS_MASTER_KEY
+    - DATABASE_URL
+
+accessories:
+  db:
+    image: postgres:17
+    host: 3.233.189.168
+    # Bind to loopback only; the app container reaches it over the Kamal network.
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: webauthn
+        POSTGRES_DB: webauthn_rails_demo_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
 
 ssh:
   user: ubuntu

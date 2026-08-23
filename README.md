@@ -19,6 +19,7 @@ If you want to see an implementation of WebAuthn as a second factor authenticato
 #### Prerequisites
 
 * Ruby
+* PostgreSQL (running locally, or reachable via the `DATABASE_*` env vars below)
 
 #### Setup
 
@@ -28,6 +29,11 @@ $ cd webauthn-rails-demo-app/
 $ bundle install
 $ bundle exec rake db:setup
 ```
+
+The database connection defaults to `localhost:5432` using your OS username with
+no password. Override it with `DATABASE_HOST`, `DATABASE_PORT`,
+`DATABASE_USERNAME` and `DATABASE_PASSWORD`, or set `DATABASE_URL` to a full
+connection string.
 
 #### Running
 
