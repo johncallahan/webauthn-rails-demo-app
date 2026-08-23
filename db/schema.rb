@@ -10,23 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2020_04_11_210422) do
+ActiveRecord::Schema[8.1].define(version: 2020_04_11_210422) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "credentials", force: :cascade do |t|
-    t.string "external_id"
-    t.string "public_key"
-    t.integer "user_id"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
+    t.string "external_id"
     t.string "nickname"
+    t.string "public_key"
     t.bigint "sign_count", default: 0, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.integer "user_id"
     t.index ["external_id"], name: "index_credentials_on_external_id", unique: true
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "username"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.string "username"
     t.string "webauthn_id"
     t.index ["username"], name: "index_users_on_username", unique: true
   end
