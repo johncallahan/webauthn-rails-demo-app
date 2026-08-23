@@ -51,6 +51,7 @@ class RegistrationsController < ApplicationController
         render json: "Couldn't register your Security Key", status: :unprocessable_content
       end
     rescue WebAuthn::Error => e
+      puts "Verification failed: ${e.message}"
       render json: "Verification failed: #{e.message}", status: :unprocessable_content
     ensure
       session.delete(:current_registration)
